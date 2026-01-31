@@ -1,0 +1,108 @@
+@page
+@using Dapper
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model Fitnesstracker.Pages.Profile
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+@{
+    // JSON-Daten aus ViewData laden
+    var bodyPartDataJson = ViewData["BodyPartData"]?.ToString() ?? "[]";
+    Layout = "_Layout";
+    var userId = HttpContextAccessor.HttpContext.Request.Cookies["userId"];
+    string username = null;
+    string email = "@beispiel.com";
+    if (!string.IsNullOrEmpty(userId))
+    {
+        using var connection = new MySql.Data.MySqlClient.MySqlConnection(
+        @"server=localhost;port=3306;database=fitnesstracker;user=root;password=Aimilios123!");
+        username = connection.QueryFirstOrDefault<string>(
+        "SELECT NAME FROM users WHERE Id = @Id",
+        new { Id = int.Parse(userId) });
+    }
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Profile</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Welcome, @username</h1>
+    <br />
+    <div class="profile-center">
+        <div class="profile-container">
+            <div class="row">
+                <div class="col-md-7">
+                    <div class="profile-picture">
+                        <img src="/profile.jpg" alt="Profile Picture">
+                    </div>
+                    <div class="profile-info">
+                        <div class="contact-header">Personal Info</div>
+                        <div class="contact-info">
+                            <p>Email: @username@email</p>
+                            <p>Phone: (+49) 123-456-7890</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="profile-sub-header" style="text-align: center;">Workouts this month</div>
+                    <div class="chart-container">
+                        <canvas id="workoutsPerWeek"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="profile-sub-header">Workout History</div>
+            <hr>
+            <div class="profile-sub-header">Goals</div>
+        </div>
+    </div>
+    <br />
+    <div class="profile-center">
+        <form method="post">
+            <a href="/User_Exercises" class="btn btn-outline-primary user-exercises-btn" style="margin-bottom: 10px;">Übungen</a>
+            <a href="/View_User_Exercise" class="btn btn-outline-primary user-exercises-btn" style="margin-bottom: 10px;">View Exercises</a> <!-- Neuer Button -->
+            <button type="submit" class="btn btn-outline-danger logout-btn">Logout</button>
+        </form>
+    </div>
+
+    <script>
+        // BodyPartCounter-Daten aus Razor in JavaScript überführen (nur die int-Werte)
+        var data = JSON.parse('@Html.Raw(bodyPartDataJson)');
+
+        var ctx = document.getElementById('workoutsPerWeek').getContext('2d');
+        var workoutsPerWeek = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Waist', 'Upper Legs', 'Back', 'Lower Legs', 'Chest'],  // Muskelgruppen (Labels)
+                datasets: [{
+                    label: 'Muscle Groups',
+                    data: data,  // Nur die Anzahl der Übungen für jede Muskelgruppe
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(35, 17, 181, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(255,99,132,1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(35, 17, 181, 0.5)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+        });
+    </script>
+</body>
+</html> 

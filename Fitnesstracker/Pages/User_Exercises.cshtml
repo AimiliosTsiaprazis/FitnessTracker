@@ -1,0 +1,77 @@
+@page
+@model Fitnesstracker.Pages.UserExercisesModel
+@{
+var userExercises = Model.userExercises;
+var exercises = Model.Exercises;
+
+string FirstLetterToUpper(string str)
+{
+    if (str == null)
+        return null;
+
+    if (str.Length > 1)
+        return char.ToUpper(str[0]) + str.Substring(1);
+
+    return str.ToUpper();
+}
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User exercises</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css">
+</head>
+<body>
+<div class="container">
+    <h1>User Exercises</h1>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Exercise</th>
+            <th>Repetitions</th>
+            <th>Sets</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @if (userExercises != null && userExercises.Count > 0)
+        {
+        @foreach (var exercise in userExercises)
+        {
+            
+        // Find the exercise name from the list where the ID matches
+        var exerciseId = exercise.EXERCISE_ID.ToString();
+        var matchedExercise = exercises.FirstOrDefault(e => e.Id == exerciseId);
+
+        string exerciseName = "Exercise not found";
+        if (matchedExercise != null)  {
+            exerciseName = FirstLetterToUpper(matchedExercise.Name);
+        }
+
+        <tr>
+            <td>@exerciseName</td>
+            <td>@exercise.REPETITIONS</td>
+            <td>@exercise.SETS</td>
+            <td>
+                <a href="/View_User_Exercise?name=@exerciseName&reps=@exercise.REPETITIONS&sets=@exercise.SETS" target="_blank" title="Start Exercise"><span class="glyphicon glyphicon-circle-arrow-right start-exercise-icon">
+                    
+                </span></a>
+            </td>
+        </tr>
+        }
+        }
+        else
+        {
+        <tr>
+            <td colspan="4">No exercises found for the current user.</td>
+        </tr>
+        }
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

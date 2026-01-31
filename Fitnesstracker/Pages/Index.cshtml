@@ -1,0 +1,161 @@
+﻿@page
+@model IndexModel
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+ViewData["Title"] = "Exercises";
+}
+
+@{
+    string FirstLetterToUpper(string str)
+    {
+        if (str == null)
+            return null;
+
+        if (str.Length > 1)
+            return char.ToUpper(str[0]) + str.Substring(1);
+
+        return str.ToUpper();
+    }
+}
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+</head>
+<div class="text-center">
+    <h1 class="display-4">Fitness Tracker</h1>
+</div> 
+<form method="get">
+    <div class="mb-3">
+        <label for="body-part" class="form-label">Body part</label>
+        <select class="form-select" id="body-part" name="bodyPart">
+            <option value="">All</option>
+            @foreach (var bodyPart in Model.BodyParts)
+            {
+                <option value="@bodyPart" selected="@(bodyPart == Request.Query["bodyPart"] ? "selected" : null)">@FirstLetterToUpper(bodyPart)</option>
+            }
+        </select>
+        <br>
+        <input class="btn btn-primary exercise-btn" type="submit" value="Search" style="width: 100%"><br>
+    </div>
+</form>
+
+    <h2>Exercises:</h2>
+<div class="text-center">
+    @if (Model.ApiResult != null) 
+    {
+        foreach (var exercise in Model.ApiResult)
+        {
+            <div class="exercise-box" data-exercise-id="@exercise.Id"> 
+                <h3>@FirstLetterToUpper(exercise.Name) @exercise.Id</h3>
+                <p>Body Part: @FirstLetterToUpper(exercise.BodyPart)</p>
+                <p>Equipment: @FirstLetterToUpper(exercise.Equipment)</p>
+                <p>Target: @FirstLetterToUpper(exercise.Target)</p>
+                <p>Secondary Muscles: @FirstLetterToUpper(string.Join(", ", exercise.SecondaryMuscles))</p>
+                <p>Instructions: @Html.Raw(string.Join("<br/>", exercise.Instructions))</p>
+                <div class="center-image">
+                    <img src="@exercise.GifUrl" alt="@exercise.Name"/>
+                </div>
+                
+                @if (HttpContextAccessor.HttpContext.Request.Cookies.ContainsKey("userId"))
+                {
+                    <span class="btn btn-primary add-exercise-btn exercise-btn">Add</span>
+                }
+            </div>
+        }
+    }
+</div>
+
+<!-- Add exercise modal -->
+<div class="modal fade" id="exerciseModal" tabindex="-1" aria-labelledby="exerciseModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exerciseModalLabel">Add Exercise</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="exerciseForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="repetitions">Repetitions</label>
+                        <input type="number" class="form-control" id="repetitions" placeholder="Enter repetitions" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="sets">Sets</label>
+                        <input type="number" class="form-control" id="sets" placeholder="Enter sets" value="3">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var addExerciseButtons = document.querySelectorAll('.add-exercise-btn');
+        var closeModalButtons = document.querySelectorAll('[data-dismiss="modal"]');
+        var saveChangesButton = document.querySelector('#exerciseModal .btn-primary');
+
+        addExerciseButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                var exerciseBox = this.closest('.exercise-box');
+                var exerciseName = exerciseBox.querySelector('h3').textContent;
+                var exerciseId = exerciseBox.getAttribute('data-exercise-id');
+                var modalTitle = document.querySelector('#exerciseModalLabel');
+                modalTitle.textContent = exerciseName;
+
+                // Set the exercise ID as a data attribute on the modal
+                document.querySelector('#exerciseModal').setAttribute('data-exercise-id', exerciseId);
+
+                $('#exerciseModal').modal('show');
+            });
+        });
+
+        closeModalButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                $('#exerciseModal').modal('hide');
+            });
+        });
+
+        if (saveChangesButton) {
+            saveChangesButton.addEventListener('click', function() {
+                var repetitions = document.getElementById('repetitions').value;
+                var sets = document.getElementById('sets').value;
+                var userId = '@HttpContextAccessor.HttpContext.Request.Cookies["userId"]';
+                var exerciseId = document.querySelector('#exerciseModal').getAttribute('data-exercise-id');
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/ajax/ExerciseHandler?handler=InsertExercise', // Adjust the URL to match your Razor Page path and handler
+                    data: {
+                        userId: userId,
+                        exerciseId: exerciseId,
+                        repetitions: repetitions,
+                        sets: sets,
+                        
+                    },
+                    headers: {
+                        "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val() // Add anti-forgery token
+                    },
+                    success: function(response) {
+                        $('#exerciseModal').modal('hide');
+                        alert('Exercise saved successfully!');
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error saving exercise. ' + error + status + xhr.responseText);
+                    }
+                });
+            });
+        }
+    });
+
+</script>

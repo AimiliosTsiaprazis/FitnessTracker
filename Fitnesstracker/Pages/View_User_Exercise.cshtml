@@ -1,0 +1,154 @@
+@page
+@model Fitnesstracker.Pages.ViewUserExerciseModel
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Workout Viewer</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .exercise-box {
+            margin-bottom: 20px;
+        }
+
+        .navigation-buttons {
+            margin-top: 20px;
+        }
+
+        .timer {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+
+        .center-image {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+    <script>
+        let timerInterval;
+        let timeRemaining = 60; // Timer duration in seconds (e.g., 60 seconds)
+        let isPaused = true;    // Track if the timer is paused
+
+        // Function to start/resume the timer
+        function startTimer() {
+            if (!isPaused) return; // Prevent multiple intervals
+
+            isPaused = false;
+            const timerDisplay = document.getElementById("timerDisplay");
+            timerDisplay.textContent = formatTime(timeRemaining);
+
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                timerDisplay.textContent = formatTime(timeRemaining);
+
+                // When the timer reaches 0, submit the form to go to the next exercise
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById("nextExerciseForm").querySelector("button").click(); // Auto-click "Next"
+                }
+            }, 1000);
+        }
+
+        // Function to stop the timer
+        function stopTimer() {
+            isPaused = true;
+            clearInterval(timerInterval);
+        }
+
+        // Function to format time in MM:SS format
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // Event listener to start the timer when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById("startTimerBtn").addEventListener('click', startTimer);
+            document.getElementById("stopTimerBtn").addEventListener('click', stopTimer);
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Workout Viewer</h1>
+
+        @if (Model.CurrentExercise != null)
+        {
+            <div class="exercise-box text-center">
+                <h2>@Model.CurrentExercise.Name</h2>
+                <!--
+                <p><strong>Body Part:</strong> @Model.CurrentExercise.BodyPart</p>
+                <p><strong>Equipment:</strong> @Model.CurrentExercise.Equipment</p>
+                <p><strong>Target:</strong> @Model.CurrentExercise.Target</p>
+                <p><strong>Secondary Muscles:</strong> @string.Join(", ", Model.CurrentExercise.SecondaryMuscles)</p>
+                <p><strong>Instructions:</strong></p>
+
+                <ul>
+                    @foreach (var instruction in Model.CurrentExercise.Instructions)
+                    {
+                        <li>@instruction</li>
+                    }
+                </ul>
+                -->
+                <!-- Center the GIF -->
+                <div class="center-image">
+                    <img src="@Model.CurrentExercise.GifUrl" alt="Exercise GIF" />
+                </div>
+
+                <!-- Timer Display -->
+                <div class="timer text-center">
+                    Time Remaining: <span id="timerDisplay">00:00</span>
+                </div>
+                <button id="startTimerBtn" class="btn btn-success mt-2">Start Timer</button>
+                <button id="stopTimerBtn" class="btn btn-danger mt-2">Stop Timer</button>
+
+                <!-- Navigation Buttons -->
+                <div class="navigation-buttons text-center">
+                    <!-- Wrapping the forms in divs with inline-block to align them side by side -->
+                    <div style="display: inline-block;">
+                        <form method="post">
+                            <input type="hidden" name="currentIndex" value="@Model.CurrentIndex" />
+                            <button type="submit" class="btn btn-primary" name="action" value="previous">
+                                Previous Exercise
+                            </button>
+                        </form>
+                    </div>
+
+                    <div style="display: inline-block; margin-left: 10px;">
+                        <!-- Form for next exercise -->
+                        <form id="nextExerciseForm" method="post">
+                            <input type="hidden" name="currentIndex" value="@Model.CurrentIndex" />
+                            <button type="submit" class="btn btn-primary" name="action" value="next">
+                                Next Exercise
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div>
+                    <br />
+
+
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <p class="text-center">No exercises available.</p>
+        }
+    </div>
+</body>
+</html>

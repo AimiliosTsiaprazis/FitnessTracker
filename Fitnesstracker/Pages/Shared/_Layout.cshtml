@@ -1,0 +1,69 @@
+﻿@using Dapper
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+var userId = HttpContextAccessor.HttpContext.Request.Cookies["userId"];
+string username = null;
+if (!string.IsNullOrEmpty(userId))
+{
+using var connection = new MySql.Data.MySqlClient.MySqlConnection(
+@"server=localhost;port=3306;database=fitnesstracker;user=root;password=Aimilios123!");
+username = connection.QueryFirstOrDefault<string>(
+"SELECT NAME FROM users WHERE Id = @Id",
+new { Id = int.Parse(userId) });
+}
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Fitnesstracker</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Fitnesstracker.styles.css" asp-append-version="true" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <div class="container">
+            <a class="navbar-brand" asp-area="" asp-page="/Index">Fitnesstracker</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            @if (string.IsNullOrEmpty(username))
+            {
+                <a class="nav-link navbar-text" asp-page="/Login">
+                    <span class="bi bi-person-fill"></span> Login
+                </a>
+            }
+            else
+            {
+                <a class="nav-link navbar-text" asp-page="/Profile">
+                    <span class="bi bi-person-fill"></span> @username
+                </a>
+            }
+        </div>
+    </nav>
+</header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2024 - Fitnesstracker
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

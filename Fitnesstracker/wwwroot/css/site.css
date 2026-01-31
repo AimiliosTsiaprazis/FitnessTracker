@@ -1,0 +1,206 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.exercise-box {
+  border: 1px solid #ddd;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+.exercise-box h3 {
+  font-size: 1.5em;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.exercise-box p {
+  color: #666;
+  line-height: 1.6;
+}
+
+.exercise-box img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin-top: 20px;
+}
+.center-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/*Login Page*/
+.login-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 100px;
+}
+
+.login-design {
+    background: url(/login-background.jpg) no-repeat center center fixed;
+    background-size: cover;
+    border-radius: 75px;
+    box-shadow: 1px 1px 40px rgba(0, 0, 0, 0.6);
+    max-width: 750px;
+    margin: auto;
+    margin-top: 4%;
+}
+.login-logo{
+    max-height: 250px;
+    max-width: 250px;
+}
+h1, h2 {
+    text-align: center;
+    font-weight:bold;
+}
+
+.exercise-btn {
+    background-color: #007bff;
+    border: none;
+    border-radius: 20px !important;
+    transition: 0.8s;
+}
+
+.exercise-btn:hover {
+    background-color: darkblue;
+    font-size: larger;
+    transition:  0.7s;
+}
+
+.logout-btn, .user-exercises-btn {
+    width:100%;
+    border-radius: 20px;
+    transition: 0.6s;
+    padding-right:50px;
+    padding-left:50px;
+}
+.logout-btn:hover, .user-exercises-btn:hover  {
+    font-size:larger;
+    transition:0.6s;
+}
+
+.form-group label {
+    font-weight: bold;
+}
+
+a {
+    display: block;
+    text-align: center;
+    color: #007bff;
+    transition: 0.5s;
+}
+
+    a:hover {
+        text-decoration: underline;
+        transition: 0.5s;
+        font-size:18px;
+    }
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+.body-login-register {
+    background: url(/login-background.jpg) no-repeat center center fixed;
+    background-size: cover;
+}
+
+/*Profile Page */
+.profile-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: 40px;
+}
+.profile-container {
+    border: 1px solid blue;
+    border-radius: 50px;
+    box-shadow: 0px 1px 15px rgba(0, 0, 0, 1);
+    padding: 50px;
+    /*max-width: 600px;*/
+    width: 100%;
+    box-sizing: border-box;
+    /*text-align: center;*/
+}
+
+.profile-picture img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #000;
+}
+
+.profile-info {
+    margin-top: 20px;
+}
+
+.profile-info h1 {
+    margin: 10px 0;
+    font-size: 24px;
+}
+
+.profile-sub-header {
+    font-size: 20px;
+} 
+
+.bio {
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+.contact-header {
+    font-size: 24px;
+}
+
+.contact-info {
+    font-size: 16px;
+}
+
+.contact-info p {
+    margin: 5px 0;
+}
+
+.add-exercise-btn {
+    margin-top: 20px;
+    width: 88px;
+}
+
+.start-exercise-icon {
+    cursor: pointer;
+    transition: 0.3s;
+    text-decoration: none;
+    color: black;
+    
+}
+
+.start-exercise-icon:hover {
+    transition: 0.3s;
+    color: #3dcef6;
+}
